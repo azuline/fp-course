@@ -12,7 +12,7 @@ import qualified Prelude as P
 --
 -- It might be thought of as a list, with a maximum length of one.
 data Optional a =
-  Full a
+    Full a
   | Empty
   deriving (Eq, Show)
 
@@ -23,12 +23,12 @@ data Optional a =
 --
 -- >>> mapOptional (+1) (Full 8)
 -- Full 9
-mapOptional ::
-  (a -> b)
+mapOptional
+  :: (a -> b)
   -> Optional a
   -> Optional b
-mapOptional =
-  error "todo: Course.Optional#mapOptional"
+mapOptional f (Full x) = Full (f x)
+mapOptional _ Empty    = Empty
 
 -- | Bind the given function on the possible value.
 --
@@ -40,12 +40,12 @@ mapOptional =
 --
 -- >>> bindOptional (\n -> if even n then Full (n - 1) else Full (n + 1)) (Full 9)
 -- Full 10
-bindOptional ::
-  (a -> Optional b)
+bindOptional
+  :: (a -> Optional b)
   -> Optional a
   -> Optional b
-bindOptional =
-  error "todo: Course.Optional#bindOptional"
+bindOptional f (Full x) = f x
+bindOptional _ Empty    = Empty
 
 -- | Return the possible value if it exists; otherwise, the second argument.
 --
@@ -54,12 +54,12 @@ bindOptional =
 --
 -- >>> Empty ?? 99
 -- 99
-(??) ::
-  Optional a
+(??)
+  :: Optional a
   -> a
   -> a
-(??) =
-  error "todo: Course.Optional#(??)"
+Full x ?? y = x
+Empty  ?? y = y
 
 -- | Try the first optional for a value. If it has a value, use it; otherwise,
 -- use the second value.
@@ -75,12 +75,12 @@ bindOptional =
 --
 -- >>> Empty <+> Empty
 -- Empty
-(<+>) ::
-  Optional a
+(<+>)
+  :: Optional a
   -> Optional a
   -> Optional a
-(<+>) =
-  error "todo: Course.Optional#(<+>)"
+Full x <+> _  = Full x
+Empty  <+> mY = mY
 
 -- | Replaces the Full and Empty constructors in an optional.
 --
@@ -89,16 +89,16 @@ bindOptional =
 --
 -- >>> optional (+1) 0 Empty
 -- 0
-optional ::
-  (a -> b)
+optional
+  :: (a -> b)
   -> b
   -> Optional a
   -> b
-optional =
-  error "todo: Course.Optional#optional"
+optional f _ (Full x) = f x
+optional _ z Empty    = z
 
 applyOptional :: Optional (a -> b) -> Optional a -> Optional b
-applyOptional f a = bindOptional (\f' -> mapOptional f' a) f
+applyOptional f a = bindOptional (`mapOptional` a) f
 
 twiceOptional :: (a -> b -> c) -> Optional a -> Optional b -> Optional c
 twiceOptional f = applyOptional . mapOptional f
