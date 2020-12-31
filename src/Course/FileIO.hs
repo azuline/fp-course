@@ -13,25 +13,6 @@ import Course.List
 
 {-
 
-Useful Functions --
-
-  getArgs :: IO (List Chars)
-  putStrLn :: Chars -> IO ()
-  readFile :: FilePath -> IO Chars
-  lines :: Chars -> List Chars
-  void :: IO a -> IO ()
-
-Abstractions --
-  Applicative, Monad:
-
-    <$>, <*>, >>=, =<<, pure
-
-Tuple Functions that could help --
-
-  fst :: (a, b) -> a
-  snd :: (a, b) -> b
-  (,) :: a -> b -> (a, b)
-
 Problem --
   Given a single argument of a file name, read that file,
   each line of that file contains the name of another file,
@@ -77,54 +58,66 @@ the contents of b
 ============ share/c.txt
 the contents of c
 
+Useful Functions --
+
+  getArgs :: IO (List Chars)
+  putStrLn :: Chars -> IO ()
+  readFile :: FilePath -> IO Chars
+  lines :: Chars -> List Chars
+  void :: IO a -> IO ()
+
+Abstractions --
+  Applicative, Monad:
+
+    <$>, <*>, >>=, =<<, pure
+
+Tuple Functions that could help --
+
+  fst :: (a, b) -> a
+  snd :: (a, b) -> b
+  (,) :: a -> b -> (a, b)
+
 -}
 
 -- Given the file name, and file contents, print them.
 -- Use @putStrLn@.
-printFile ::
-  FilePath
-  -> Chars
-  -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
+printFile :: FilePath -> Chars -> IO ()
+printFile filepath contents =
+  do putStrLn $ "============ " ++ filepath
+     putStrLn contents
 
 -- Given a list of (file name and file contents), print each.
 -- Use @printFile@.
-printFiles ::
-  List (FilePath, Chars)
-  -> IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
+printFiles :: List (FilePath, Chars) -> IO ()
+printFiles files = void . sequence $ uncurry printFile <$> files
+
+-- Earlier version:
+-- printFiles = foldRight (\x acc -> uncurry printFile x *> acc) (pure ())
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
-getFile ::
-  FilePath
-  -> IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile :: FilePath -> IO (FilePath, Chars)
+getFile filepath = (,) filepath <$> readFile filepath
 
+-- {-# ANN module "HLint: ignore Use mapM" #-}
 -- Given a list of file names, return list of (file name and file contents).
 -- Use @getFile@.
-getFiles ::
-  List FilePath
-  -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles :: List FilePath -> IO (List (FilePath, Chars))
+getFiles = sequence . (<$>) getFile
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@, @lines@, and @printFiles@.
-run ::
-  FilePath
-  -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+run :: FilePath -> IO ()
+run filepath =
+  do filepaths <- lines <$> readFile filepath
+     files     <- getFiles filepaths
+     printFiles files
 
 -- /Tip:/ use @getArgs@ and @run@
-main ::
-  IO ()
+main :: IO ()
 main =
-  error "todo: Course.FileIO#main"
+  do filepath :. _ <- getArgs
+     run filepath
 
 ----
 
