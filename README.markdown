@@ -2,9 +2,9 @@
 
 ![System-F](https://system-f.gitlab.io/logo/systemf-450x450.jpg)
 
-- [ ] `Course.Optional`
-- [ ] `Course.List`
-- [ ] `Course.Functor`
+- [x] `Course.Optional`
+- [x] `Course.List`
+- [x] `Course.Functor`
 - [ ] `Course.Applicative`
 - [ ] `Course.Monad`
 - [ ] `Course.FileIO`
