@@ -5,7 +5,7 @@
 - [x] `Course.Optional`
 - [x] `Course.List`
 - [x] `Course.Functor`
-- [ ] `Course.Applicative`
+- [x] `Course.Applicative`
 - [ ] `Course.Monad`
 - [ ] `Course.FileIO`
 - [ ] `Course.State`
