@@ -146,8 +146,8 @@ distinct xs = eval (filtering checkNotSeen xs) S.empty
     checkNotSeen :: Ord a => a -> State (S.Set a) Bool
     checkNotSeen x =
       do seen <- get
-         put        $ x `S.insert` seen
-         pure . not $ x `S.member` seen
+         put  $ x `S.insert` seen
+         pure $ x `S.notMember` seen
 
 -- | A happy number is a positive integer, where the sum of the
 -- square of its digits eventually reaches 1 after repetition.
