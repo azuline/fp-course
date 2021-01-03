@@ -9,6 +9,7 @@ import Course.ExactlyOne
 import Course.List
 import Course.Optional
 import Course.Functor
+import qualified Prelude as P
 
 -- | All instances of the `Extend` type-class must satisfy one law. This law
 -- is not checked by the compiler. This law is given as:
@@ -17,24 +18,20 @@ import Course.Functor
 --   `∀f g. (f <<=) . (g <<=) ≅ (<<=) (f . (g <<=))`
 class Functor k => Extend k where
   -- Pronounced, extend.
-  (<<=) ::
-    (k a -> b)
-    -> k a
-    -> k b
+  (<<=) :: (k a -> b) -> k a -> k b
+  (=>>) :: k a -> (k a -> b) -> k b
+  (=>>) = flip (<<=)
 
 infixr 1 <<=
+infixl 1 =>>
 
 -- | Implement the @Extend@ instance for @ExactlyOne@.
 --
 -- >>> id <<= ExactlyOne 7
 -- ExactlyOne (ExactlyOne 7)
 instance Extend ExactlyOne where
-  (<<=) ::
-    (ExactlyOne a -> b)
-    -> ExactlyOne a
-    -> ExactlyOne b
-  (<<=) =
-    error "todo: Course.Extend (<<=)#instance ExactlyOne"
+  (<<=) :: (ExactlyOne a -> b) -> ExactlyOne a -> ExactlyOne b
+  f <<= x = ExactlyOne (f x)
 
 -- | Implement the @Extend@ instance for @List@.
 --
@@ -47,12 +44,11 @@ instance Extend ExactlyOne where
 -- >>> reverse <<= ((1 :. 2 :. 3 :. Nil) :. (4 :. 5 :. 6 :. Nil) :. Nil)
 -- [[[4,5,6],[1,2,3]],[[4,5,6]]]
 instance Extend List where
-  (<<=) ::
-    (List a -> b)
-    -> List a
-    -> List b
-  (<<=) =
-    error "todo: Course.Extend (<<=)#instance List"
+  -- Could probably do this with a map over some kind of `tails` function?
+  -- Don't want to deal with folding over this >_>
+  (<<=) :: (List a -> b) -> List a -> List b
+  _ <<= Nil      = Nil
+  f <<= l@(_:.xs) = f l :. (f <<= xs)
 
 -- | Implement the @Extend@ instance for @Optional@.
 --
@@ -62,12 +58,9 @@ instance Extend List where
 -- >>> id <<= Empty
 -- Empty
 instance Extend Optional where
-  (<<=) ::
-    (Optional a -> b)
-    -> Optional a
-    -> Optional b
-  (<<=) =
-    error "todo: Course.Extend (<<=)#instance Optional"
+  (<<=) :: (Optional a -> b) -> Optional a -> Optional b
+  _ <<= Empty = Empty
+  f <<= x     = Full $ f x
 
 -- | Duplicate the functor using extension.
 --
@@ -82,9 +75,5 @@ instance Extend Optional where
 --
 -- >>> cojoin Empty
 -- Empty
-cojoin ::
-  Extend k =>
-  k a
-  -> k (k a)
-cojoin =
-  error "todo: Course.Extend#cojoin"
+cojoin :: Extend k => k a -> k (k a)
+cojoin = (<<=) id
