@@ -21,7 +21,7 @@
 - [x] `Course.JsonParser`
 - [x] `Course.Interactive`
 - [x] `Course.Anagrams`
-- [ ] `Course.FastAnagrams`
+- [x] `Course.FastAnagrams`
 - [ ] `Course.Cheque`
 
 ### Written by Tony Morris & Mark Hibberd
