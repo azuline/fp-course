@@ -19,7 +19,7 @@
 - [x] `Course.Parser` _(see also `Course.Person` for the parsing rules)_
 - [x] `Course.MoreParser`
 - [x] `Course.JsonParser`
-- [ ] `Course.Interactive`
+- [x] `Course.Interactive`
 - [ ] `Course.Anagrams`
 - [ ] `Course.FastAnagrams`
 - [ ] `Course.Cheque`

@@ -13,26 +13,17 @@ import Course.List
 import Course.Optional
 
 -- | Eliminates any value over which a functor is defined.
-vooid ::
-  Functor m =>
-  m a
-  -> m ()
-vooid =
-  (<$>) (const ())
+vooid :: Functor m => m a -> m ()
+vooid = (<$>) (const ())
 
 -- | A version of @bind@ that ignores the result of the effect.
-(>-) ::
-  Monad m =>
-  m a
-  -> m b
-  -> m b
-(>-) a =
-  (>>=) a . const
+(>-) :: Monad m => m a -> m b -> m b
+(>-) a = (>>=) a . const
 
 -- | Runs an action until a result of that action satisfies a given predicate.
-untilM ::
-  Monad m =>
-  (a -> m Bool) -- ^ The predicate to satisfy to stop running the action.
+untilM
+  :: Monad m
+  => (a -> m Bool) -- ^ The predicate to satisfy to stop running the action.
   -> m a -- ^ The action to run until the predicate satisfies.
   -> m a
 untilM p a =
@@ -80,10 +71,11 @@ data Op =
 -- /Tip:/ @putStr :: String -> IO ()@ -- Prints a string to standard output.
 --
 -- /Tip:/ @putStrLn :: String -> IO ()@ -- Prints a string and then a new line to standard output.
-convertInteractive ::
-  IO ()
+convertInteractive :: IO ()
 convertInteractive =
-  error "todo: Course.Interactive#convertInteractive"
+  do putStr "Input string: "
+     input <- getLine 
+     putStrLn $ toUpper <$> input
 
 -- |
 --
@@ -108,10 +100,13 @@ convertInteractive =
 -- /Tip:/ @putStr :: String -> IO ()@ -- Prints a string to standard output.
 --
 -- /Tip:/ @putStrLn :: String -> IO ()@ -- Prints a string and then a new line to standard output.
-reverseInteractive ::
-  IO ()
+reverseInteractive :: IO ()
 reverseInteractive =
-  error "todo: Course.Interactive#reverseInteractive"
+  do putStr "Input filename: "
+     filename <- getLine 
+     contents <- readFile filename
+     putStr (reverse contents)
+     writeFile filename (reverse contents)
 
 -- |
 --
@@ -134,13 +129,21 @@ reverseInteractive =
 -- /Tip:/ @putStr :: String -> IO ()@ -- Prints a string to standard output.
 --
 -- /Tip:/ @putStrLn :: String -> IO ()@ -- Prints a string and then a new line to standard output.
-encodeInteractive ::
-  IO ()
+encodeInteractive :: IO ()
 encodeInteractive =
-  error "todo: Course.Interactive#encodeInteractive"
+  do putStr "Input string: "
+     input <- getLine
+     putStrLn (encodeString input)
 
-interactive ::
-  IO ()
+encodeString :: Chars -> Chars
+encodeString Nil    = Nil
+encodeString (x:.xs)
+  | x == ' '  = "%20" ++ encodeString xs
+  | x == '\t' = "%09" ++ encodeString xs
+  | x == '"'  = "%22" ++ encodeString xs
+  | otherwise = x :. encodeString xs
+
+interactive :: IO ()
 interactive =
   let ops = (
                Op 'c' "Convert a string to upper-case" convertInteractive
