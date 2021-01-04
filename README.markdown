@@ -15,7 +15,7 @@
 - [x] `Course.Contravariant`
 - [x] `Course.Compose`
 - [x] `Course.Traversable`
-- [ ] `Course.ListZipper`
+- [x] `Course.ListZipper`
 - [ ] `Course.Parser` _(see also `Course.Person` for the parsing rules)_
 - [ ] `Course.MoreParser`
 - [ ] `Course.JsonParser`
