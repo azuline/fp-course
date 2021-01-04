@@ -17,7 +17,7 @@
 - [x] `Course.Traversable`
 - [x] `Course.ListZipper`
 - [x] `Course.Parser` _(see also `Course.Person` for the parsing rules)_
-- [ ] `Course.MoreParser`
+- [x] `Course.MoreParser`
 - [ ] `Course.JsonParser`
 - [ ] `Course.Interactive`
 - [ ] `Course.Anagrams`
