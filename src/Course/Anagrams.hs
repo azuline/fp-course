@@ -7,6 +7,8 @@ module Course.Anagrams where
 import Course.Core
 import Course.List
 import Course.Functor
+import Course.Monad
+import Course.Applicative
 
 {-
 
@@ -28,17 +30,14 @@ Functions that might help
 
 -- Return all anagrams of the given string
 -- that appear in the given dictionary file.
-anagrams ::
-  Chars
-  -> FilePath
-  -> IO (List Chars)
-anagrams =
-  error "todo: Course.Anagrams#anagrams"
+anagrams :: Chars -> FilePath -> IO (List Chars)
+anagrams string dictFile =
+  do dict <- lines <$> readFile dictFile
+     pure $ genAnagrams string dict
+
+genAnagrams :: Chars -> List Chars -> List Chars
+genAnagrams string dict = intersectBy equalIgnoringCase dict (permutations string)
 
 -- Compare two strings for equality, ignoring case
-equalIgnoringCase ::
-  Chars
-  -> Chars
-  -> Bool
-equalIgnoringCase =
-  error "todo: Course.Anagrams#equalIgnoringCase"
+equalIgnoringCase :: Chars -> Chars -> Bool
+equalIgnoringCase x y = (toLower <$> x) == (toLower <$> y)

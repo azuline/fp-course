@@ -20,7 +20,7 @@
 - [x] `Course.MoreParser`
 - [x] `Course.JsonParser`
 - [x] `Course.Interactive`
-- [ ] `Course.Anagrams`
+- [x] `Course.Anagrams`
 - [ ] `Course.FastAnagrams`
 - [ ] `Course.Cheque`
 
