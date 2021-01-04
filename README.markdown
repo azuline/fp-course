@@ -16,7 +16,7 @@
 - [x] `Course.Compose`
 - [x] `Course.Traversable`
 - [x] `Course.ListZipper`
-- [ ] `Course.Parser` _(see also `Course.Person` for the parsing rules)_
+- [x] `Course.Parser` _(see also `Course.Person` for the parsing rules)_
 - [ ] `Course.MoreParser`
 - [ ] `Course.JsonParser`
 - [ ] `Course.Interactive`
