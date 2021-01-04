@@ -224,6 +224,10 @@ satisfy f = character >>= lift3 bool unexpectedCharParser valueParser f
 is :: Char -> Parser Char
 is c = satisfy (== c)
 
+-- | Haha good helper function, opposite of `is`.
+isnt :: Char -> Parser Char
+isnt c = satisfy (/= c)
+
 -- | Return a parser that produces a character between '0' and '9' but fails if
 --
 --   * The input is empty.

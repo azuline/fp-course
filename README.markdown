@@ -18,7 +18,7 @@
 - [x] `Course.ListZipper`
 - [x] `Course.Parser` _(see also `Course.Person` for the parsing rules)_
 - [x] `Course.MoreParser`
-- [ ] `Course.JsonParser`
+- [x] `Course.JsonParser`
 - [ ] `Course.Interactive`
 - [ ] `Course.Anagrams`
 - [ ] `Course.FastAnagrams`
