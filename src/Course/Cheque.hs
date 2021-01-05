@@ -2,6 +2,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+-- Ugh this is disgusting but I'm tired.
+
 {-
 
 Write a function (dollars) that accepts a `String` and returns a `String`.
@@ -177,7 +179,7 @@ illion =
 
 -- A data type representing the digits zero to nine.
 data Digit =
-  Zero
+    Zero
   | One
   | Two
   | Three
@@ -189,63 +191,40 @@ data Digit =
   | Nine
   deriving (Eq, Ord)
 
-showDigit ::
-  Digit
-  -> Chars
-showDigit Zero =
-  "zero"
-showDigit One =
-  "one"
-showDigit Two =
-  "two"
-showDigit Three =
-  "three"
-showDigit Four =
-  "four"
-showDigit Five =
-  "five"
-showDigit Six =
-  "six"
-showDigit Seven =
-  "seven"
-showDigit Eight =
-  "eight"
-showDigit Nine =
-  "nine"
+showDigit :: Digit -> Chars
+showDigit Zero = "zero"
+showDigit One = "one"
+showDigit Two = "two"
+showDigit Three = "three"
+showDigit Four = "four"
+showDigit Five = "five"
+showDigit Six = "six"
+showDigit Seven = "seven"
+showDigit Eight = "eight"
+showDigit Nine = "nine"
 
 -- A data type representing one, two or three digits, which may be useful for grouping.
 data Digit3 =
-  D1 Digit
+    D1 Digit
   | D2 Digit Digit
   | D3 Digit Digit Digit
   deriving Eq
 
 -- Possibly convert a character to a digit.
-fromChar ::
-  Char
-  -> Optional Digit
-fromChar '0' =
-  Full Zero
-fromChar '1' =
-  Full One
-fromChar '2' =
-  Full Two
-fromChar '3' =
-  Full Three
-fromChar '4' =
-  Full Four
-fromChar '5' =
-  Full Five
-fromChar '6' =
-  Full Six
-fromChar '7' =
-  Full Seven
-fromChar '8' =
-  Full Eight
-fromChar '9' =
-  Full Nine
-fromChar _ =
-  Empty
+fromChar :: Char -> Optional Digit
+fromChar '0' = Full Zero
+fromChar '1' = Full One
+fromChar '2' = Full Two
+fromChar '3' = Full Three
+fromChar '4' = Full Four
+fromChar '5' = Full Five
+fromChar '6' = Full Six
+fromChar '7' = Full Seven
+fromChar '8' = Full Eight
+fromChar '9' = Full Nine
+fromChar _   = Empty
+
+data Money = Money (List Digit3) Digit3
 
 -- | Take a numeric value and produce its English output.
 --
@@ -320,8 +299,101 @@ fromChar _ =
 --
 -- >>> dollars "456789123456789012345678901234567890123456789012345678901234567890.12"
 -- "four hundred and fifty-six vigintillion seven hundred and eighty-nine novemdecillion one hundred and twenty-three octodecillion four hundred and fifty-six septendecillion seven hundred and eighty-nine sexdecillion twelve quindecillion three hundred and forty-five quattuordecillion six hundred and seventy-eight tredecillion nine hundred and one duodecillion two hundred and thirty-four undecillion five hundred and sixty-seven decillion eight hundred and ninety nonillion one hundred and twenty-three octillion four hundred and fifty-six septillion seven hundred and eighty-nine sextillion twelve quintillion three hundred and forty-five quadrillion six hundred and seventy-eight trillion nine hundred and one billion two hundred and thirty-four million five hundred and sixty-seven thousand eight hundred and ninety dollars and twelve cents"
-dollars ::
-  Chars
-  -> Chars
-dollars =
-  error "todo: Course.Cheque#dollars"
+dollars :: Chars -> Chars
+dollars s = formatDollars d ++ " and " ++ formatCents c
+  where
+    Money d c = parseMoney s
+
+-- | Parse the stream of digits into cash money. Do we not have parser
+-- module for this??
+parseMoney :: Chars -> Money
+parseMoney s = Money (groupDollars dollarsDigits) cents
+  where 
+    (dollarsDigits, s') = parseDollars s
+    cents               = parseCents s'
+
+-- | Parse dollars from lowest weight to highest. Return the remaining characters.
+parseDollars :: Chars -> (List Digit, Chars)
+parseDollars = go Nil
+  where
+    go digits Nil       = (digits, Nil)
+    go digits ('.':.xs) = (digits, xs)
+    go digits (x  :.xs) = case fromChar x of
+                            Full d -> go (d:.digits) xs
+                            Empty  -> go digits      xs
+
+-- | Parse cents, will always return a `D2`.
+parseCents :: Chars -> Digit3
+parseCents s =
+  case fromChar <$> filter isDigit s of
+    Full x :. Nil         -> D2 x Zero
+    Full x :. Full y :. _ -> D2 x y
+    _                     -> D2 Zero Zero
+
+-- | Group a list of dollars (min-weight to max weight) into relevant
+-- Digit3 groupings, still from min-weight to max-weight.
+groupDollars :: List Digit -> List Digit3
+groupDollars = go
+  where
+    go (x:.y:.z:.xs ) = D3 z y x :. go xs
+    go (   y:.z:.Nil) = D2 z y   :. Nil
+    go (      z:.Nil) = D1 z     :. Nil
+    go           Nil  = Nil
+
+formatDollars :: List Digit3 -> Chars
+formatDollars ds = formattedOutput ++ "dollar" ++ trailingS
+  where
+    formattedOutput          =
+      let o = join . reverse $ formatDollar <$> zip ds illion
+      in if isEmpty o then "zero " else o
+    formatDollar (d, suffix) = let o = formatD d
+                                in if o == "zero" && not (isEmpty suffix)
+                                   then ""
+                                   else if isEmpty suffix
+                                        then o ++ " "
+                                        else o ++ " " ++ suffix ++ " "
+    trailingS                = if formattedOutput == "one " then "" else "s"
+
+-- | Format cents.
+formatCents :: Digit3 -> Chars
+formatCents d = formattedOutput ++ " cent" ++ trailingS
+  where
+    formattedOutput = formatD d
+    trailingS       = if formattedOutput == "one" then "" else "s"
+
+-- | Format Digit3.
+formatD :: Digit3 -> Chars
+formatD (D1 x        ) = showDigit x
+formatD (D2 Zero y   ) = showDigit y
+formatD (D2 One  y   ) = showTeens y
+formatD (D2 x    Zero) = showTens x
+formatD (D2 x    y   ) = showTens x ++ "-" ++ showDigit y
+formatD (D3 Zero y z ) = formatD (D2 y z)
+formatD (D3 x    y z ) = let tens = if y /= Zero || z /= Zero
+                                   then " and " ++ formatD (D2 y z)
+                                   else ""
+                        in showDigit x ++ " hundred" ++ tens
+
+showTeens :: Digit -> Chars
+showTeens Zero = "ten"
+showTeens One = "eleven"
+showTeens Two = "twelve"
+showTeens Three = "thirteen"
+showTeens Four = "fourteen"
+showTeens Five = "fifteen"
+showTeens Six = "sixteen"
+showTeens Seven = "seventeen"
+showTeens Eight = "eighteen"
+showTeens Nine = "nineteen"
+
+showTens :: Digit -> Chars
+showTens Zero = error "GO away there is no zeroth tens!"
+showTens One = error "GO away are you sure you didnt means showTeens!"
+showTens Two = "twenty"
+showTens Three = "thirty"
+showTens Four = "forty"
+showTens Five = "fifty"
+showTens Six = "sixty"
+showTens Seven = "seventy"
+showTens Eight = "eighty"
+showTens Nine = "ninety"

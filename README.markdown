@@ -22,7 +22,8 @@
 - [x] `Course.Interactive`
 - [x] `Course.Anagrams`
 - [x] `Course.FastAnagrams`
-- [ ] `Course.Cheque`
+- [x] `Course.Cheque`
+- [ ] `Course.Alternative`
 
 ### Written by Tony Morris & Mark Hibberd
 
